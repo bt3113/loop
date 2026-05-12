@@ -10,11 +10,11 @@ This branch contains a deployable Next.js prototype with:
 - Private group framing for a London friend group
 - Event cards with Interested / Let's Talk / Decline reactions
 - Group signal badges such as Strong interest and Needs discussion
-- Event discovery form for category, date/week, budget, and London area
-- `/api/discover` route with normalized demo results
+- Static event discovery form for category, date/week, budget, and London area
 - One-click pinning from discovery into the group board
 - Timeline view for week-level planning
 - Decision board: Pinned, Discussing, Likely, Confirmed
+- GitHub Pages static export configuration
 
 ## Run locally
 
@@ -24,6 +24,18 @@ npm run dev
 ```
 
 Then open `http://localhost:3000`.
+
+## Deploy to GitHub Pages
+
+This project is configured for GitHub Pages at:
+
+```text
+https://bt3113.github.io/loop/
+```
+
+Deployment runs from `.github/workflows/deploy-pages.yml` on pushes to `main`.
+
+After merging the MVP PR into `main`, go to GitHub repository settings and make sure Pages is set to deploy from **GitHub Actions** rather than a branch folder.
 
 ## Product direction
 
@@ -42,7 +54,7 @@ Loop should answer:
 1. Add Google OAuth.
 2. Add persistent database tables for users, groups, events, reactions, comments, and pins.
 3. Add invite links for friend groups.
-4. Replace the demo discovery catalogue with real event-source adapters.
+4. Replace the static discovery catalogue with real event-source adapters.
 5. Add OpenAI ranking/summarisation for discovered events.
 6. Add Google Calendar sync for confirmed plans.
 7. Add WhatsApp share links and notifications.
