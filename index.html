@@ -1,0 +1,1158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Loop | Group planning for friends</title>
+    <meta
+      name="description"
+      content="Loop is a private social planning board for friend groups to discover London events, pin plans, and vote on what to do next."
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #09090b;
+        --panel: rgba(255, 255, 255, 0.075);
+        --panel-strong: rgba(255, 255, 255, 0.12);
+        --line: rgba(255, 255, 255, 0.14);
+        --text: #f8fafc;
+        --soft: #d4d4d8;
+        --muted: #a1a1aa;
+        --purple: #8b5cf6;
+        --purple-strong: #6d28d9;
+        --green: #34d399;
+        --amber: #fbbf24;
+        --red: #fb7185;
+        --radius-xl: 28px;
+        --radius-lg: 20px;
+        --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at top left, rgba(124, 58, 237, 0.35), transparent 34rem),
+          radial-gradient(circle at top right, rgba(14, 165, 233, 0.22), transparent 32rem),
+          linear-gradient(135deg, #08080b 0%, #10111a 55%, #15101f 100%);
+        color: var(--text);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .shell {
+        width: min(1440px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 28px 0 48px;
+      }
+
+      .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 14px 16px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.055);
+        backdrop-filter: blur(18px);
+        position: sticky;
+        top: 16px;
+        z-index: 20;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 850;
+        letter-spacing: -0.03em;
+        font-size: 22px;
+      }
+
+      .logo {
+        width: 40px;
+        height: 40px;
+        display: grid;
+        place-items: center;
+        border-radius: 14px;
+        background: linear-gradient(145deg, #c4b5fd, #7c3aed 54%, #312e81);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 10px 34px rgba(124, 58, 237, 0.45);
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .nav-links a,
+      .pill {
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid transparent;
+      }
+
+      .nav-links a:hover,
+      .pill:hover {
+        color: var(--text);
+        border-color: var(--line);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.08fr) minmax(340px, 0.92fr);
+        gap: 24px;
+        align-items: stretch;
+        margin-top: 32px;
+      }
+
+      .hero-card,
+      .panel,
+      .event-card,
+      .discovery-card,
+      .timeline-card {
+        border: 1px solid var(--line);
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(22px);
+      }
+
+      .hero-card {
+        min-height: 520px;
+        border-radius: var(--radius-xl);
+        padding: 42px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-card::after {
+        content: "";
+        position: absolute;
+        inset: auto -120px -160px auto;
+        width: 430px;
+        height: 430px;
+        background: radial-gradient(circle, rgba(167, 139, 250, 0.36), transparent 68%);
+        pointer-events: none;
+      }
+
+      .kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border: 1px solid rgba(167, 139, 250, 0.35);
+        border-radius: 999px;
+        color: #ddd6fe;
+        background: rgba(124, 58, 237, 0.14);
+        font-size: 13px;
+        font-weight: 750;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        margin: 28px 0 18px;
+        max-width: 780px;
+        font-size: clamp(48px, 7vw, 96px);
+        line-height: 0.92;
+        letter-spacing: -0.08em;
+      }
+
+      h2 {
+        font-size: clamp(28px, 4vw, 46px);
+        letter-spacing: -0.055em;
+        margin-bottom: 10px;
+      }
+
+      h3 {
+        letter-spacing: -0.03em;
+        margin-bottom: 8px;
+      }
+
+      .hero-copy {
+        max-width: 700px;
+        color: var(--soft);
+        font-size: 19px;
+        line-height: 1.7;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 30px;
+      }
+
+      .btn {
+        border: 0;
+        border-radius: 999px;
+        padding: 13px 18px;
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--line);
+        transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .btn.primary {
+        background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+        border-color: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 14px 36px rgba(109, 40, 217, 0.35);
+        font-weight: 750;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 48px;
+        position: relative;
+        z-index: 2;
+      }
+
+      .stat {
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.055);
+      }
+
+      .stat strong {
+        display: block;
+        font-size: 28px;
+        letter-spacing: -0.05em;
+      }
+
+      .stat span {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .panel {
+        border-radius: var(--radius-xl);
+        padding: 24px;
+      }
+
+      .panel-header,
+      .section-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .friend-stack {
+        display: flex;
+        align-items: center;
+        margin-top: 20px;
+      }
+
+      .avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        border: 2px solid rgba(9, 9, 11, 0.85);
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.06));
+        font-size: 13px;
+        font-weight: 800;
+        margin-left: -8px;
+      }
+
+      .avatar:first-child {
+        margin-left: 0;
+      }
+
+      .feature-list {
+        display: grid;
+        gap: 12px;
+        margin-top: 28px;
+      }
+
+      .feature {
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.045);
+      }
+
+      .feature strong {
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .feature span {
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .section {
+        margin-top: 28px;
+      }
+
+      .section-top {
+        align-items: end;
+      }
+
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .event-card {
+        border-radius: 24px;
+        padding: 18px;
+        overflow: hidden;
+      }
+
+      .event-image {
+        min-height: 156px;
+        border-radius: 20px;
+        padding: 14px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        background:
+          linear-gradient(145deg, rgba(255, 255, 255, 0.2), transparent),
+          radial-gradient(circle at bottom left, rgba(124, 58, 237, 0.5), transparent 55%),
+          linear-gradient(135deg, #18181b, #312e81);
+      }
+
+      .event-image.food {
+        background:
+          linear-gradient(145deg, rgba(255, 255, 255, 0.18), transparent),
+          radial-gradient(circle at bottom left, rgba(251, 146, 60, 0.58), transparent 56%),
+          linear-gradient(135deg, #18181b, #7c2d12);
+      }
+
+      .event-image.comedy {
+        background:
+          linear-gradient(145deg, rgba(255, 255, 255, 0.18), transparent),
+          radial-gradient(circle at bottom left, rgba(34, 211, 238, 0.42), transparent 58%),
+          linear-gradient(135deg, #18181b, #164e63);
+      }
+
+      .event-image.sport {
+        background:
+          linear-gradient(145deg, rgba(255, 255, 255, 0.18), transparent),
+          radial-gradient(circle at bottom left, rgba(52, 211, 153, 0.42), transparent 58%),
+          linear-gradient(135deg, #18181b, #064e3b);
+      }
+
+      .date-chip,
+      .status-chip,
+      .category-chip {
+        border-radius: 999px;
+        padding: 8px 11px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        font-size: 12px;
+        font-weight: 750;
+      }
+
+      .status-chip {
+        color: #ddd6fe;
+      }
+
+      .event-body {
+        padding-top: 16px;
+      }
+
+      .meta-row,
+      .signal-row,
+      .response-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .meta-row {
+        color: var(--muted);
+        font-size: 14px;
+        margin-bottom: 12px;
+      }
+
+      .dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 999px;
+        background: var(--muted);
+      }
+
+      .signal {
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 14px;
+        padding: 10px 12px;
+        color: var(--soft);
+        font-size: 13px;
+      }
+
+      .signal.good {
+        border-color: rgba(52, 211, 153, 0.35);
+        color: #bbf7d0;
+      }
+
+      .signal.talk {
+        border-color: rgba(251, 191, 36, 0.35);
+        color: #fde68a;
+      }
+
+      .response-row {
+        margin-top: 14px;
+      }
+
+      .response-btn {
+        flex: 1;
+        min-width: 112px;
+        border-radius: 14px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--soft);
+        border: 1px solid var(--line);
+      }
+
+      .response-btn:hover {
+        background: rgba(255, 255, 255, 0.11);
+      }
+
+      .discovery-card {
+        border-radius: var(--radius-xl);
+        padding: 24px;
+      }
+
+      .discovery-layout {
+        display: grid;
+        grid-template-columns: 0.86fr 1.14fr;
+        gap: 18px;
+        align-items: start;
+      }
+
+      .search-form {
+        display: grid;
+        gap: 12px;
+      }
+
+      .field {
+        display: grid;
+        gap: 7px;
+      }
+
+      .field label {
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      .field input,
+      .field select,
+      .panel select {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: rgba(0, 0, 0, 0.18);
+        color: var(--text);
+        border-radius: 15px;
+        padding: 12px 13px;
+        outline: none;
+      }
+
+      .field input:focus,
+      .field select:focus,
+      .panel select:focus {
+        border-color: rgba(167, 139, 250, 0.65);
+      }
+
+      .results-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .result-item {
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.045);
+      }
+
+      .result-item-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .timeline-card {
+        border-radius: var(--radius-xl);
+        padding: 24px;
+        overflow: hidden;
+      }
+
+      .timeline {
+        display: grid;
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .timeline-row {
+        display: grid;
+        grid-template-columns: 160px minmax(0, 1fr);
+        gap: 14px;
+        align-items: center;
+      }
+
+      .timeline-label {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .timeline-track {
+        min-height: 44px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.04);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .timeline-bar {
+        position: absolute;
+        top: 7px;
+        bottom: 7px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(167, 139, 250, 0.95), rgba(96, 165, 250, 0.8));
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        font-size: 13px;
+        font-weight: 750;
+        white-space: nowrap;
+      }
+
+      .board {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .column {
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 14px;
+        background: rgba(255, 255, 255, 0.04);
+        min-height: 240px;
+      }
+
+      .column-title {
+        color: var(--soft);
+        font-size: 14px;
+        font-weight: 800;
+        margin-bottom: 12px;
+      }
+
+      .mini-card {
+        padding: 13px;
+        border-radius: 17px;
+        background: rgba(0, 0, 0, 0.16);
+        border: 1px solid var(--line);
+        margin-bottom: 10px;
+      }
+
+      .footer {
+        margin-top: 34px;
+        padding: 24px;
+        border-radius: var(--radius-xl);
+        color: var(--muted);
+        text-align: center;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.045);
+      }
+
+      @media (max-width: 1060px) {
+        .hero,
+        .discovery-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .grid-3,
+        .board {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .stats {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 720px) {
+        .shell {
+          width: min(100% - 20px, 1440px);
+          padding-top: 10px;
+        }
+
+        .navbar {
+          align-items: flex-start;
+          border-radius: 24px;
+          flex-direction: column;
+        }
+
+        .nav-links {
+          width: 100%;
+          overflow-x: auto;
+          padding-bottom: 2px;
+        }
+
+        .hero-card,
+        .panel,
+        .discovery-card,
+        .timeline-card {
+          padding: 20px;
+        }
+
+        .grid-3,
+        .board,
+        .stats {
+          grid-template-columns: 1fr;
+        }
+
+        .section-top,
+        .panel-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .timeline-row {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <nav class="navbar" aria-label="Main navigation">
+        <a class="brand" href="#top" aria-label="Loop home">
+          <span class="logo">∞</span>
+          Loop
+        </a>
+        <div class="nav-links">
+          <a href="#plans">Plans</a>
+          <a href="#discover">Discover</a>
+          <a href="#timeline">Timeline</a>
+          <a href="#decisions">Decisions</a>
+        </div>
+      </nav>
+
+      <section class="hero" id="top">
+        <div class="hero-card">
+          <span class="kicker">Private planning board for your WhatsApp group</span>
+          <h1>Turn group chat chaos into actual plans.</h1>
+          <p class="hero-copy">
+            Loop helps friends discover London events, pin ideas, vote Interested / Let’s Talk / Declined, and promote the best options into confirmed plans.
+          </p>
+          <div class="actions">
+            <a class="btn primary" href="#discover">Find events</a>
+            <a class="btn" href="#plans">View group board</a>
+          </div>
+
+          <div class="stats" aria-label="Loop summary stats">
+            <div class="stat">
+              <strong id="stat-events">3</strong>
+              <span>active ideas</span>
+            </div>
+            <div class="stat">
+              <strong id="stat-interested">9</strong>
+              <span>interest signals</span>
+            </div>
+            <div class="stat">
+              <strong id="stat-talk">4</strong>
+              <span>discussion flags</span>
+            </div>
+            <div class="stat">
+              <strong id="stat-likely">1</strong>
+              <span>likely plans</span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="panel" aria-labelledby="prototype-heading">
+          <div class="panel-header">
+            <div>
+              <p class="muted">Current group</p>
+              <h2 id="prototype-heading">London Loop</h2>
+            </div>
+            <select id="active-user" aria-label="Act as friend">
+              <option value="bhavesh">Bhavesh</option>
+              <option value="arjun">Arjun</option>
+              <option value="meera">Meera</option>
+              <option value="rishi">Rishi</option>
+              <option value="priya">Priya</option>
+              <option value="aman">Aman</option>
+            </select>
+          </div>
+
+          <p class="muted">
+            Prototype mode: pick a friend, vote on event cards, search the demo discovery feed, and pin results into the board.
+          </p>
+
+          <div class="friend-stack" aria-label="Friends in group">
+            <span class="avatar" title="Bhavesh">BT</span>
+            <span class="avatar" title="Arjun">AJ</span>
+            <span class="avatar" title="Meera">MR</span>
+            <span class="avatar" title="Rishi">RS</span>
+            <span class="avatar" title="Priya">PK</span>
+            <span class="avatar" title="Aman">AM</span>
+          </div>
+
+          <div class="feature-list">
+            <div class="feature">
+              <strong>Group intent, not just RSVP</strong>
+              <span>Interested, Let’s Talk, and Declined capture the planning stage before anything is final.</span>
+            </div>
+            <div class="feature">
+              <strong>Discovery to decision</strong>
+              <span>Search by category, week, budget, and area. Pin the best results directly to the private board.</span>
+            </div>
+            <div class="feature">
+              <strong>Timeline-first planning</strong>
+              <span>See how proposed meetups fit across the week without opening a dense calendar grid.</span>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section" id="plans">
+        <div class="section-top">
+          <div>
+            <p class="muted">Group board</p>
+            <h2>Plans your friends can actually decide on.</h2>
+          </div>
+          <span class="pill" id="board-summary">1 pinned · 1 likely</span>
+        </div>
+
+        <div class="grid-3" id="events-grid"></div>
+      </section>
+
+      <section class="section discovery-card" id="discover">
+        <div class="section-top">
+          <div>
+            <p class="muted">Event discovery</p>
+            <h2>Search London ideas in the format your group needs.</h2>
+          </div>
+          <span class="pill">Static demo, API-ready data shape</span>
+        </div>
+
+        <div class="discovery-layout">
+          <form class="search-form" id="discovery-form">
+            <div class="field">
+              <label for="category">Category</label>
+              <select id="category">
+                <option>Comedy</option>
+                <option>Food</option>
+                <option>Music</option>
+                <option>Culture</option>
+                <option>Sport</option>
+                <option>Free events</option>
+                <option>Nightlife</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="date-range">Date or week</label>
+              <select id="date-range">
+                <option>Today</option>
+                <option selected>This weekend</option>
+                <option>Next week</option>
+                <option>Next month</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="budget">Budget</label>
+              <select id="budget">
+                <option>Free</option>
+                <option>Under £20</option>
+                <option selected>Under £30</option>
+                <option>Under £50</option>
+                <option>Any price</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="area">Area</label>
+              <input id="area" value="London" placeholder="London, Shoreditch, Soho..." />
+            </div>
+            <button class="btn primary" type="submit" id="search-btn">Search events</button>
+          </form>
+
+          <div class="results-list" id="results-list" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="section timeline-card" id="timeline">
+        <div class="section-top">
+          <div>
+            <p class="muted">Timeline view</p>
+            <h2>A lighter alternative to a dense calendar.</h2>
+          </div>
+          <span class="pill">Week of 18 May</span>
+        </div>
+        <div class="timeline">
+          <div class="timeline-row"><div class="timeline-label">Mon</div><div class="timeline-track"><div class="timeline-bar" style="left:3%;width:8%">Quiet</div></div></div>
+          <div class="timeline-row"><div class="timeline-label">Tue</div><div class="timeline-track"><div class="timeline-bar" style="left:16%;width:15%">Open slots</div></div></div>
+          <div class="timeline-row"><div class="timeline-label">Wed</div><div class="timeline-track"><div class="timeline-bar" style="left:32%;width:12%">Open slots</div></div></div>
+          <div class="timeline-row"><div class="timeline-label">Thu</div><div class="timeline-track"><div class="timeline-bar" style="left:48%;width:16%">Comedy option</div></div></div>
+          <div class="timeline-row"><div class="timeline-label">Fri</div><div class="timeline-track"><div class="timeline-bar" style="left:66%;width:20%">Jazz night</div></div></div>
+          <div class="timeline-row"><div class="timeline-label">Weekend</div><div class="timeline-track"><div class="timeline-bar" style="left:79%;width:18%">Market + lunch</div></div></div>
+        </div>
+      </section>
+
+      <section class="section panel" id="decisions">
+        <div class="section-top">
+          <div>
+            <p class="muted">Decision board</p>
+            <h2>Move ideas from maybe to confirmed.</h2>
+          </div>
+          <span class="pill">Suggested → Discussing → Likely → Confirmed</span>
+        </div>
+        <div class="board" id="decision-board"></div>
+      </section>
+
+      <footer class="footer">
+        Loop MVP: private friend groups, event discovery, pinning, reactions, timeline, and decision flow.
+      </footer>
+    </main>
+
+    <script>
+      const friends = [
+        { id: "bhavesh", name: "Bhavesh", initials: "BT" },
+        { id: "arjun", name: "Arjun", initials: "AJ" },
+        { id: "meera", name: "Meera", initials: "MR" },
+        { id: "rishi", name: "Rishi", initials: "RS" },
+        { id: "priya", name: "Priya", initials: "PK" },
+        { id: "aman", name: "Aman", initials: "AM" }
+      ];
+
+      let activeUser = "bhavesh";
+
+      let events = [
+        {
+          id: "jazz-soho",
+          title: "Late jazz night in Soho",
+          category: "Music",
+          date: "Fri 22 May",
+          time: "8:30 PM",
+          area: "Soho",
+          price: "££",
+          status: "Likely",
+          vibe: "Good for a proper evening plan after dinner.",
+          source: "Pinned from Discover",
+          imageTone: "music",
+          reactions: { interested: ["bhavesh", "meera", "priya", "aman"], talk: ["rishi"], declined: [] }
+        },
+        {
+          id: "sunday-market",
+          title: "Columbia Road + lunch crawl",
+          category: "Food",
+          date: "Sun 24 May",
+          time: "11:00 AM",
+          area: "Shoreditch",
+          price: "£",
+          status: "Discussing",
+          vibe: "Low-friction daytime plan with food, coffee, and a walk.",
+          source: "Manual idea",
+          imageTone: "food",
+          reactions: { interested: ["bhavesh", "arjun", "meera"], talk: ["priya", "rishi"], declined: ["aman"] }
+        },
+        {
+          id: "comedy-east",
+          title: "East London comedy night",
+          category: "Comedy",
+          date: "Thu 28 May",
+          time: "7:00 PM",
+          area: "Bethnal Green",
+          price: "Under £25",
+          status: "Pinned",
+          vibe: "Cheap, central enough, and easy to discuss before booking.",
+          source: "Suggested by Arjun",
+          imageTone: "comedy",
+          reactions: { interested: ["arjun", "rishi"], talk: ["bhavesh"], declined: [] }
+        }
+      ];
+
+      const catalogue = {
+        Comedy: [
+          { id: "comedy-club-east", title: "East London stand-up night", category: "Comedy", date: "Friday evening", area: "Bethnal Green", price: "Under £25", source: "Demo adapter: comedy feed", why: "Affordable, social, and easy to plan." },
+          { id: "soho-comedy-cellar", title: "Soho basement comedy lineup", category: "Comedy", date: "This weekend", area: "Soho", price: "Under £30", source: "Demo adapter: comedy feed", why: "Central location and simple drinks-after option." },
+          { id: "camden-comedy-new-material", title: "New material comedy showcase", category: "Comedy", date: "Next week", area: "Camden", price: "Under £20", source: "Demo adapter: comedy feed", why: "Lower commitment than a headline show." }
+        ],
+        Food: [
+          { id: "brixton-food-hall", title: "Brixton street food hall night", category: "Food", date: "Friday night", area: "Brixton", price: "£10-£25", source: "Demo adapter: food feed", why: "Flexible arrival times and several food options." },
+          { id: "shoreditch-supper-club", title: "Casual supper club table", category: "Food", date: "This weekend", area: "Shoreditch", price: "Under £50", source: "Demo adapter: food feed", why: "More organised than just drinks." },
+          { id: "borough-market-route", title: "Borough Market lunch route", category: "Food", date: "Saturday afternoon", area: "London Bridge", price: "£10-£30", source: "Demo adapter: food feed", why: "Low-risk daytime plan with no ticket dependency." }
+        ],
+        Music: [
+          { id: "jazz-soho-late", title: "Late jazz room in Soho", category: "Music", date: "Friday night", area: "Soho", price: "Under £50", source: "Demo adapter: music feed", why: "Good for dinner before and drinks after." },
+          { id: "dalston-live-session", title: "Dalston live session", category: "Music", date: "This weekend", area: "Dalston", price: "Under £30", source: "Demo adapter: music feed", why: "Casual music night without a major gig commitment." },
+          { id: "southbank-classical-late", title: "South Bank late classical set", category: "Music", date: "Next week", area: "South Bank", price: "Under £30", source: "Demo adapter: music feed", why: "Cultural and calmer than nightlife." }
+        ],
+        Culture: [
+          { id: "gallery-late-southbank", title: "Gallery late route", category: "Culture", date: "Thursday evening", area: "South Bank", price: "Free", source: "Demo adapter: culture feed", why: "Free entry and central location." },
+          { id: "immersive-exhibition", title: "Immersive exhibition slot", category: "Culture", date: "This weekend", area: "King's Cross", price: "Under £30", source: "Demo adapter: culture feed", why: "Structured but not too formal." },
+          { id: "museum-after-hours", title: "Museum after-hours session", category: "Culture", date: "Next week", area: "Kensington", price: "Under £20", source: "Demo adapter: culture feed", why: "Affordable and easy to pair with dinner." }
+        ],
+        Sport: [
+          { id: "five-a-side-slot", title: "Five-a-side pitch slot", category: "Sport", date: "Sunday afternoon", area: "Hackney", price: "£8-£15 each", source: "Demo adapter: sport feed", why: "Good active plan if enough people commit early." },
+          { id: "football-screening", title: "Big match pub screening", category: "Sport", date: "This weekend", area: "Islington", price: "Free entry", source: "Demo adapter: sport feed", why: "Casual option where declined votes do not ruin the plan." },
+          { id: "climbing-social", title: "Indoor climbing social", category: "Sport", date: "Next week", area: "Vauxhall", price: "Under £25", source: "Demo adapter: sport feed", why: "More memorable than drinks and flexible for mixed ability levels." }
+        ],
+        "Free events": [
+          { id: "free-open-air-market", title: "Open-air market and walk", category: "Free events", date: "Saturday afternoon", area: "Hackney Wick", price: "Free", source: "Demo adapter: free events feed", why: "Zero-pressure plan with optional food/drinks." },
+          { id: "free-gallery-night", title: "Free gallery night", category: "Free events", date: "Thursday evening", area: "Mayfair", price: "Free", source: "Demo adapter: free events feed", why: "Useful for mixed budgets and easy drinks after." },
+          { id: "riverside-walk", title: "Riverside walk and coffee route", category: "Free events", date: "Sunday morning", area: "Greenwich", price: "Free", source: "Demo adapter: free events feed", why: "Simple daytime backup plan." }
+        ],
+        Nightlife: [
+          { id: "shoreditch-dj-bar", title: "Shoreditch DJ bar night", category: "Nightlife", date: "Saturday night", area: "Shoreditch", price: "Under £20", source: "Demo adapter: nightlife feed", why: "Flexible and not too ticket-heavy." },
+          { id: "camden-late-room", title: "Camden late room", category: "Nightlife", date: "Friday night", area: "Camden", price: "Under £30", source: "Demo adapter: nightlife feed", why: "Better for a smaller subgroup that wants a louder plan." },
+          { id: "soho-cocktail-route", title: "Soho cocktail route", category: "Nightlife", date: "This weekend", area: "Soho", price: "Any price", source: "Demo adapter: nightlife feed", why: "Flexible route-style plan where people can join late." }
+        ]
+      };
+
+      function friendName(id) {
+        return friends.find((friend) => friend.id === id)?.name || id;
+      }
+
+      function namesFor(ids) {
+        return ids.map(friendName).join(", ");
+      }
+
+      function signalFor(event) {
+        const interested = event.reactions.interested.length;
+        const talk = event.reactions.talk.length;
+        const declined = event.reactions.declined.length;
+
+        if (interested >= 4) return { label: "Strong interest", className: "signal good" };
+        if (talk >= 2) return { label: "Needs discussion", className: "signal talk" };
+        if (declined >= 3) return { label: "Weak fit", className: "signal" };
+        return { label: "Gathering signal", className: "signal" };
+      }
+
+      function updateStats() {
+        const interested = events.reduce((sum, event) => sum + event.reactions.interested.length, 0);
+        const talking = events.reduce((sum, event) => sum + event.reactions.talk.length, 0);
+        const likely = events.filter((event) => event.status === "Likely").length;
+        const pinned = events.filter((event) => event.status === "Pinned").length;
+
+        document.getElementById("stat-events").textContent = events.length;
+        document.getElementById("stat-interested").textContent = interested;
+        document.getElementById("stat-talk").textContent = talking;
+        document.getElementById("stat-likely").textContent = likely;
+        document.getElementById("board-summary").textContent = `${pinned} pinned · ${likely} likely`;
+      }
+
+      function reactToEvent(eventId, reaction) {
+        events = events.map((event) => {
+          if (event.id !== eventId) return event;
+
+          const nextReactions = {
+            interested: event.reactions.interested.filter((id) => id !== activeUser),
+            talk: event.reactions.talk.filter((id) => id !== activeUser),
+            declined: event.reactions.declined.filter((id) => id !== activeUser)
+          };
+
+          nextReactions[reaction].push(activeUser);
+
+          return {
+            ...event,
+            reactions: nextReactions,
+            status: reaction === "interested" && nextReactions.interested.length >= 4 ? "Likely" : reaction === "talk" ? "Discussing" : event.status
+          };
+        });
+
+        render();
+      }
+
+      function renderEvents() {
+        const grid = document.getElementById("events-grid");
+        grid.innerHTML = events.slice(0, 6).map((event) => {
+          const signal = signalFor(event);
+          const interestedLine = event.reactions.interested.length > 0 ? `Interested: ${namesFor(event.reactions.interested)}` : "No interest yet.";
+          return `
+            <article class="event-card">
+              <div class="event-image ${event.imageTone}">
+                <span class="date-chip">${event.date}</span>
+                <span class="status-chip">${event.status}</span>
+              </div>
+              <div class="event-body">
+                <div class="meta-row"><span>${event.category}</span><span class="dot"></span><span>${event.area}</span><span class="dot"></span><span>${event.price}</span></div>
+                <h3>${event.title}</h3>
+                <p class="muted">${event.time} · ${event.vibe}</p>
+                <div class="signal-row">
+                  <span class="${signal.className}">${signal.label}</span>
+                  <span class="signal">${event.reactions.interested.length} interested</span>
+                  <span class="signal">${event.reactions.talk.length} talk</span>
+                </div>
+                <p class="muted" style="margin-top:12px;min-height:38px">${interestedLine}</p>
+                <div class="response-row" aria-label="Respond to ${event.title}">
+                  <button class="response-btn" data-event="${event.id}" data-reaction="interested">Interested</button>
+                  <button class="response-btn" data-event="${event.id}" data-reaction="talk">Let’s Talk</button>
+                  <button class="response-btn" data-event="${event.id}" data-reaction="declined">Decline</button>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join("");
+
+        grid.querySelectorAll("button[data-event]").forEach((button) => {
+          button.addEventListener("click", () => reactToEvent(button.dataset.event, button.dataset.reaction));
+        });
+      }
+
+      function resultWithContext(result) {
+        const dateRange = document.getElementById("date-range").value;
+        const budget = document.getElementById("budget").value;
+        const area = document.getElementById("area").value.trim() || "London";
+        return {
+          ...result,
+          date: dateRange,
+          area: area.toLowerCase() === "london" ? result.area : area,
+          price: budget === "Any price" ? result.price : budget,
+          why: `${result.why} Filtered for ${dateRange.toLowerCase()} around ${area}.`
+        };
+      }
+
+      function pinResult(result) {
+        const tone = result.category.toLowerCase().includes("food") ? "food" : result.category.toLowerCase().includes("comedy") ? "comedy" : result.category.toLowerCase().includes("sport") ? "sport" : "music";
+        events = [
+          {
+            id: `${result.id}-${Date.now()}`,
+            title: result.title,
+            category: result.category,
+            date: result.date,
+            time: "TBC",
+            area: result.area,
+            price: result.price,
+            status: "Pinned",
+            vibe: result.why,
+            source: result.source,
+            imageTone: tone,
+            reactions: { interested: [activeUser], talk: [], declined: [] }
+          },
+          ...events
+        ];
+        render();
+        document.getElementById("plans").scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      function renderResults(results = catalogue.Comedy.map(resultWithContext)) {
+        const list = document.getElementById("results-list");
+        list.innerHTML = results.map((result, index) => `
+          <article class="result-item">
+            <div class="result-item-top">
+              <div>
+                <div class="meta-row"><span>${result.category}</span><span class="dot"></span><span>${result.date}</span><span class="dot"></span><span>${result.area}</span></div>
+                <h3>${result.title}</h3>
+              </div>
+              <span class="category-chip">${result.price}</span>
+            </div>
+            <p class="muted">${result.why}</p>
+            <div class="meta-row"><span>${result.source}</span><span class="dot"></span><span>Pin to board, then friends vote</span></div>
+            <div class="response-row">
+              <button class="response-btn" data-result="${index}" data-action="pin">Pin</button>
+              <button class="response-btn" data-result="${index}" data-action="interested">Interested</button>
+              <button class="response-btn" data-result="${index}" data-action="talk">Let’s Talk</button>
+              <button class="response-btn" data-action="decline">Decline</button>
+            </div>
+          </article>
+        `).join("");
+
+        list.querySelectorAll("button[data-result]").forEach((button) => {
+          button.addEventListener("click", () => pinResult(results[Number(button.dataset.result)]));
+        });
+      }
+
+      function renderBoard() {
+        const board = document.getElementById("decision-board");
+        const columns = ["Pinned", "Discussing", "Likely", "Confirmed"];
+        board.innerHTML = columns.map((column) => {
+          const items = events.filter((event) => event.status === column);
+          return `
+            <div class="column">
+              <div class="column-title">${column}</div>
+              ${items.length ? items.map((event) => `
+                <div class="mini-card">
+                  <strong>${event.title}</strong>
+                  <p class="muted">${event.date} · ${event.area}</p>
+                  <span class="signal">${event.reactions.interested.length} interested</span>
+                </div>
+              `).join("") : `<p class="muted">Nothing here yet.</p>`}
+            </div>
+          `;
+        }).join("");
+      }
+
+      function render() {
+        updateStats();
+        renderEvents();
+        renderBoard();
+      }
+
+      document.getElementById("active-user").addEventListener("change", (event) => {
+        activeUser = event.target.value;
+      });
+
+      document.getElementById("discovery-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const button = document.getElementById("search-btn");
+        button.textContent = "Searching...";
+        window.setTimeout(() => {
+          const category = document.getElementById("category").value;
+          const results = (catalogue[category] || catalogue.Comedy).map(resultWithContext);
+          renderResults(results);
+          button.textContent = "Search events";
+        }, 250);
+      });
+
+      render();
+      renderResults();
+    </script>
+  </body>
+</html>
