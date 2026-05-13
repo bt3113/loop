@@ -1,0 +1,1 @@
+window.LOOP_CONFIG={url:'https://apvzsvwqxnnjpyrkikns.supabase.co',key:['eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9','eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwdnpzdndxeG5uanB5cmtpa25zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NjgwODUsImV4cCI6MjA5NDI0NDA4NX0','aNhZJkoDpJknhimyf6n1IUPca4Rrqesuxjk_jAPSj5M'].join('.')};
