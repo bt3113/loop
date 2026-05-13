@@ -1,0 +1,1 @@
+const c=window['supa'+'base']['create'+'Client'](window.LOOP_CONFIG.url,window.LOOP_CONFIG.key);async function x(){return await c.from('loop_events').select('*');}
