@@ -27,7 +27,7 @@ jobs:
       - name: Prepare static artifact
         run: |
           mkdir -p public-site
-          cp index.html public-site/index.html
+          cp loop-app/index.html public-site/index.html
           touch public-site/.nojekyll
 
       - name: Upload artifact
