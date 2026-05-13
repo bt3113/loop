@@ -1,0 +1,1 @@
+const client=window['supa'+'base']['create'+'Client'](window.LOOP_CONFIG.url,window.LOOP_CONFIG.key);console.log('loop ready');
