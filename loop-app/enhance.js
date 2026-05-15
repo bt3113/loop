@@ -4,9 +4,11 @@
     tick();
   };
   const esc = (v) => String(v || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const attr = (v) => String(v || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const dobj = (s) => new Date(s + 'T00:00:00');
   const mon = (s) => dobj(s).toLocaleDateString('en-GB', { month: 'short' });
   const day = (s) => dobj(s).toLocaleDateString('en-GB', { day: '2-digit' });
+  const pretty = (s) => dobj(s).toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' });
   const monthTitle = (s) => dobj(s).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
   const maps = (p) => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(p || '');
   let cursor = new Date();
@@ -36,12 +38,19 @@
     let html = '<div class="month-controls"><button id="enhPrev">‹ Prev</button><button id="enhNext">Next ›</button></div><div class="month-grid">' + '<div class="month-day"></div>'.repeat(off);
     for (let d = 1; d <= days; d++) {
       const matches = events.filter(e => { const x = dobj(e.date); return x.getFullYear() === y && x.getMonth() === m && x.getDate() === d; });
-      html += `<div class="month-day"><div class="month-day-num">${d}</div>${matches.map(e => `<button class="month-card" data-month-card><span>${esc(e.time)}</span>${esc(e.name)}<div class="month-pop"><a target="_blank" rel="noreferrer" href="${maps(e.postcode)}">Directions</a>${e.ticket ? `<a target="_blank" rel="noreferrer" href="${esc(e.ticket)}">Event page</a>` : ''}</div></button>`).join('')}</div>`;
+      html += `<div class="month-day"><div class="month-day-num">${d}</div>${matches.map(e => {
+        const meta = `${pretty(e.date)} · ${e.time} · ${e.category}${e.postcode ? ' · ' + e.postcode : ''}`;
+        return `<button class="month-card" data-month-card data-title="${attr(e.name)}" aria-label="${attr(e.name)}"><span>${esc(e.time)}</span><div class="month-pop"><p class="month-pop-title">${esc(e.name)}</p><p class="month-pop-meta">${esc(meta)}</p><div class="month-pop-actions"><a class="primary" target="_blank" rel="noreferrer" href="${maps(e.postcode)}">Directions</a>${e.ticket ? `<a target="_blank" rel="noreferrer" href="${esc(e.ticket)}">Event details</a>` : `<button type="button">No event link</button>`}</div></div></button>`;
+      }).join('')}</div>`;
     }
     box.innerHTML = html + '</div>';
     document.querySelector('#enhPrev').onclick = () => { cursor = new Date(y, m - 1, 1); refresh(true); };
     document.querySelector('#enhNext').onclick = () => { cursor = new Date(y, m + 1, 1); refresh(true); };
-    document.querySelectorAll('[data-month-card]').forEach(card => card.onclick = () => card.classList.toggle('open'));
+    document.querySelectorAll('[data-month-card]').forEach(card => card.onclick = (ev) => {
+      ev.stopPropagation();
+      document.querySelectorAll('[data-month-card].open').forEach(x => { if (x !== card) x.classList.remove('open'); });
+      card.classList.toggle('open');
+    });
   }
   async function refresh(force=false) {
     const events = await getEvents();
@@ -52,5 +61,6 @@
     renderTimeline(events);
     renderMonth(events);
   }
+  document.addEventListener('click', () => document.querySelectorAll('[data-month-card].open').forEach(x => x.classList.remove('open')));
   ready(() => { refresh(true); setInterval(refresh, 5000); });
 })();
