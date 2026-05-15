@@ -1,2 +1,3 @@
+@import url('./landing-premium.css?v=20260515d');
 @import url('./lumen-month.css?v=20260515c');
-/* pro.css intentionally hands Month view to lumen-month.css. The loaded dark.css remains the base theme. */
+/* pro.css now loads the premium mobile home screen plus the Lumen-inspired Month view. */
