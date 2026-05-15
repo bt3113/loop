@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="./dark.css?v=20260515a">
   <link rel="stylesheet" href="./pro.css?v=20260515b">
   <link rel="stylesheet" href="./override2.css?v=20260515e">
+  <link rel="stylesheet" href="./loop-motion.css?v=20260515a">
 </head>
 <body>
   <div class="app">
@@ -33,30 +34,42 @@
     </div>
 
     <main class="shell">
-      <section id="events" class="view active">
-        <section class="hero-card">
-          <div class="hero-copy">
-            <p class="mini">Good evening</p>
-            <h1>Fresh plans,<br>one shared<br>loop.</h1>
-            <button class="notify-pill" type="button">Group event update →</button>
-          </div>
-          <div class="glass-card">Add an event once. Everyone sees the same calendar, updates their own status, and books with less chat noise.</div>
-          <div class="shine one"></div><div class="shine two"></div>
-        </section>
+      <section id="events" class="view active events-page">
+        <div class="loop-motion-bg" aria-hidden="true">
+          <div class="loop-bg__vignette"></div>
+          <div class="loop-bg__aurora loop-bg__aurora--one"></div>
+          <div class="loop-bg__aurora loop-bg__aurora--two"></div>
+          <div class="loop-bg__beamField loop-bg__beamField--slow"></div>
+          <div class="loop-bg__beamField loop-bg__beamField--fast"></div>
+          <div class="loop-bg__orb loop-bg__orb--large"></div>
+          <div class="loop-bg__orb loop-bg__orb--small"></div>
+          <div class="loop-bg__noise"></div>
+        </div>
+        <div class="events-content">
+          <section class="hero-card">
+            <div class="hero-copy">
+              <p class="mini">Good evening</p>
+              <h1>Fresh plans,<br>one shared<br>loop.</h1>
+              <button class="notify-pill" type="button">Group event update →</button>
+            </div>
+            <div class="glass-card">Add an event once. Everyone sees the same calendar, updates their own status, and books with less chat noise.</div>
+            <div class="shine one"></div><div class="shine two"></div>
+          </section>
 
-        <section class="calendar-card">
-          <div class="calendar-top">
-            <button class="cal-nav" id="prevMonth" type="button">‹</button>
-            <span id="calTitle">Month</span>
-            <button class="cal-nav" id="nextMonth" type="button">›</button>
-          </div>
-          <div class="calendar-grid" id="calendarGrid"></div>
-        </section>
+          <section class="calendar-card">
+            <div class="calendar-top">
+              <button class="cal-nav" id="prevMonth" type="button">‹</button>
+              <span id="calTitle">Month</span>
+              <button class="cal-nav" id="nextMonth" type="button">›</button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+          </section>
 
-        <section class="upcoming-section">
-          <div class="section-label"><span>Upcoming event</span><button class="link-btn" data-view="timeline" type="button">See all &gt;</button></div>
-          <div id="eventList"></div>
-        </section>
+          <section class="upcoming-section">
+            <div class="section-label"><span>Upcoming event</span><button class="link-btn" data-view="timeline" type="button">See all &gt;</button></div>
+            <div id="eventList"></div>
+          </section>
+        </div>
       </section>
 
       <section id="timeline" class="view sub-page">
