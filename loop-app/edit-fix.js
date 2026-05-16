@@ -4,7 +4,7 @@
     if (!t) return alert(message);
     t.textContent = message;
     t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2400);
+    setTimeout(() => t.classList.remove('show'), 4200);
   }
 
   function client() {
@@ -57,7 +57,9 @@
       .maybeSingle();
 
     if (result.error) return toast(`Update failed: ${result.error.message}`);
-    if (!result.data) return toast('Update failed: no matching event was updated.');
+    if (!result.data) {
+      return toast('Update blocked by database policy. Run the Supabase SQL policy fix I added, then refresh.');
+    }
 
     document.querySelector('#editModal')?.classList.remove('open');
     toast('Event updated');
