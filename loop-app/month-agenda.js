@@ -91,6 +91,7 @@
   ready(() => {
     draw(true);
     setInterval(draw, 5000);
+    window.addEventListener('loop:events-changed', () => draw(true));
     document.querySelectorAll('[data-view="gantt"]').forEach(btn => btn.addEventListener('click', () => setTimeout(() => draw(true), 50)));
   });
 })();
