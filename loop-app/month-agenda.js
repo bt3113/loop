@@ -11,6 +11,7 @@
   let cursor = new Date();
   let selectedId = null;
   let lastJson = '';
+  let lastEvents = [];
 
   async function loadRows() {
     const db = window.supabase.createClient(window.LOOP_CONFIG.url, window.LOOP_CONFIG.key);
@@ -81,6 +82,7 @@
 
   async function draw(force = false) {
     const events = await loadRows();
+    lastEvents = events;
     const json = JSON.stringify(events);
     if (!force && json === lastJson) return;
     lastJson = json;
@@ -88,8 +90,20 @@
     render(events);
   }
 
+  function agendaRenderMonthOverride() {
+    if (lastEvents.length) render(lastEvents);
+    else draw(true);
+  }
+
   ready(() => {
+    window.__loopAgendaRenderMonth = agendaRenderMonthOverride;
+    window.renderMonth = agendaRenderMonthOverride;
     draw(true);
+    setInterval(() => {
+      if (window.renderMonth !== window.__loopAgendaRenderMonth) window.renderMonth = window.__loopAgendaRenderMonth;
+      const monthVisible = document.querySelector('#gantt')?.classList.contains('active');
+      if (monthVisible && !document.querySelector('#ganttBox .month-weekdays')) draw(true);
+    }, 900);
     setInterval(draw, 5000);
     window.addEventListener('loop:events-changed', () => draw(true));
     document.querySelectorAll('[data-view="gantt"]').forEach(btn => btn.addEventListener('click', () => setTimeout(() => draw(true), 50)));
